@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="DreamHouse:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>DreamHouse</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="DreamHouse-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="DreamHouse:war exploded" />
+    </root>
+  </artifact>
+</component>
