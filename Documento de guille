@@ -1,0 +1,142 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 29-09-2024 a las 19:57:22
+-- Versión del servidor: 8.3.0
+-- Versión de PHP: 8.2.18
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `gestionsucursales`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `empleados`
+--
+
+DROP TABLE IF EXISTS `empleados`;
+CREATE TABLE IF NOT EXISTS `empleados` (
+  `id_empleado` int NOT NULL AUTO_INCREMENT,
+  `primer_nombre` varchar(50) NOT NULL,
+  `segundo_nombre` varchar(50) DEFAULT NULL,
+  `primer_apellido` varchar(50) NOT NULL,
+  `segundo_apellido` varchar(50) DEFAULT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `categoria_laboral` enum('Encargado','Secretaria','Supervisor') NOT NULL,
+  `salario` decimal(10,2) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `fecha_nacimiento` date NOT NULL,
+  `edad` int NOT NULL,
+  `id_sucursal` int DEFAULT NULL,
+  `id_usuario` int DEFAULT NULL,
+  PRIMARY KEY (`id_empleado`),
+  UNIQUE KEY `email` (`email`),
+  KEY `id_sucursal` (`id_sucursal`),
+  KEY `id_usuario` (`id_usuario`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Disparadores `empleados`
+--
+DROP TRIGGER IF EXISTS `CrearUsuarioEmpleado`;
+DELIMITER $$
+CREATE TRIGGER `CrearUsuarioEmpleado` AFTER INSERT ON `empleados` FOR EACH ROW BEGIN
+    INSERT INTO Usuarios (usuario, password, rol)
+    VALUES (NEW.email, SHA2('password123', 256), 'Empleado');
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `propietarios`
+--
+
+DROP TABLE IF EXISTS `propietarios`;
+CREATE TABLE IF NOT EXISTS `propietarios` (
+  `id_propietario` int NOT NULL AUTO_INCREMENT,
+  `primer_nombre` varchar(50) NOT NULL,
+  `segundo_nombre` varchar(50) DEFAULT NULL,
+  `primer_apellido` varchar(50) NOT NULL,
+  `segundo_apellido` varchar(50) DEFAULT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `telefono` varchar(15) DEFAULT NULL,
+  `id_usuario` int DEFAULT NULL,
+  PRIMARY KEY (`id_propietario`),
+  UNIQUE KEY `email` (`email`),
+  KEY `id_usuario` (`id_usuario`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Disparadores `propietarios`
+--
+DROP TRIGGER IF EXISTS `CrearUsuarioPropietario`;
+DELIMITER $$
+CREATE TRIGGER `CrearUsuarioPropietario` AFTER INSERT ON `propietarios` FOR EACH ROW BEGIN
+    INSERT INTO Usuarios (usuario, password, rol)
+    VALUES (NEW.email, SHA2('password123', 256), 'Propietario');
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `sucursales`
+--
+
+DROP TABLE IF EXISTS `sucursales`;
+CREATE TABLE IF NOT EXISTS `sucursales` (
+  `id_sucursal` int NOT NULL AUTO_INCREMENT,
+  `direccion_calle` varchar(100) NOT NULL,
+  `direccion_colonia` varchar(100) NOT NULL,
+  `ciudad` varchar(50) NOT NULL,
+  `departamento` varchar(50) NOT NULL,
+  `telefono` varchar(15) DEFAULT NULL,
+  `id_empleado_dirige` int DEFAULT NULL,
+  PRIMARY KEY (`id_sucursal`),
+  KEY `id_empleado_dirige` (`id_empleado_dirige`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id_usuario` int NOT NULL AUTO_INCREMENT,
+  `usuario` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `rol` enum('Administrador','Empleado','Propietario') NOT NULL,
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `usuario` (`usuario`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`) VALUES
+(1, 'admin', '749f09bade8aca755660eeb17792da880218d4fbdc4e25fbec279d7fe9f65d70', 'Administrador');
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
